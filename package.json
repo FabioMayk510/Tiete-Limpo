@@ -1,0 +1,17 @@
+{
+  "name": "projeto-tiete-limpo",
+  "version": "1.0.0",
+  "description": "Servidor destinado à comunicação do jogo Projeto Tiete Limpo, como forma de aplicação pratica para a APS, do curso de Sistemas da Informação, na Universidade Paulista - Unip Alphavile",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fabio Mayk",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2"
+  }
+}

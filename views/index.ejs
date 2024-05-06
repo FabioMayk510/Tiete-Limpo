@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Home</title>
+</head>
+<body>
+    <script>
+        function enviarLogs(){
+            let logs = "SinglePlayer; Hard; Fabio; 3300"
+            recebeLogs(logs)
+        }
+
+        function enviarMultiLogs(){
+            let logs = "MultiPlayer; Easy; Bahia; Guti; 10000; 7500"
+            recebeLogs(logs)
+        }
+
+        function recebeLogs(logs){
+            axios.post('http://localhost:3000/logs', {
+                log: logs
+            }).then(res => {
+            console.log("Funfou")
+            }).catch(() => console.log("Não Funfou"))
+        }
+
+        function retornaLogsByName(name){
+            axios.get('http://localhost:3000/logsByName', {
+                params: {
+                    name: name
+                }
+            }).then(res => {
+                console.log(res.data)
+            })
+        }
+
+        function retornaSingleByName(name){
+            axios.get('http://localhost:3000/logsSingleByName', {
+                params: {
+                    name: name
+                }
+            }).then(res => {
+                console.log(res.data)
+            })
+        }
+
+        function retornaMultiByName(name){
+            axios.get('http://localhost:3000/logsMultiByName', {
+                params: {
+                    name: name
+                }
+            }).then(res => {
+                console.log(res.data)
+            })
+        }
+
+        function logsByScore(){
+            axios.get('http://localhost:3000/logsByScore').then(
+                res => {
+                    for(let i = 0; i < res.data.length; i++){
+                        console.log("Player: ", res.data[i].player, " Score: ", res.data[i].score)
+                    }
+                }
+            )
+        }
+    </script>
+</body>
+</html>
