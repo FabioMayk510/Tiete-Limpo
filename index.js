@@ -163,4 +163,4 @@ app.get('/logsByScore', (req, res) => {
 // Iniciar o servidor
 app.listen(port, () => {
     console.log(`Servidor iniciado em http://10.10.24.159:${port}`);
-  });
+});
