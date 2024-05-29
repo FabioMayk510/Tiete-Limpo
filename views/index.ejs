@@ -19,7 +19,7 @@
         }
 
         function recebeLogs(logs){
-            axios.post('http://localhost:3000/logs', {
+            axios.post('https://tiete-limpo.onrender.com/logs', {
                 log: logs
             }).then(res => {
             console.log("Funfou")
@@ -27,7 +27,7 @@
         }
 
         function retornaLogsByName(name){
-            axios.get('http://localhost:3000/logsByName', {
+            axios.get('https://tiete-limpo.onrender.com/logsByName', {
                 params: {
                     name: name
                 }
@@ -37,7 +37,7 @@
         }
 
         function retornaSingleByName(name){
-            axios.get('http://localhost:3000/logsSingleByName', {
+            axios.get('https://tiete-limpo.onrender.com/logsSingleByName', {
                 params: {
                     name: name
                 }
@@ -47,7 +47,7 @@
         }
 
         function retornaMultiByName(name){
-            axios.get('http://localhost:3000/logsMultiByName', {
+            axios.get('https://tiete-limpo.onrender.com/logsMultiByName', {
                 params: {
                     name: name
                 }
@@ -57,7 +57,7 @@
         }
 
         function logsByScore(){
-            axios.get('http://localhost:3000/logsByScore').then(
+            axios.get('https://tiete-limpo.onrender.com/logsByScore').then(
                 res => {
                     for(let i = 0; i < res.data.length; i++){
                         console.log("Player: ", res.data[i].player, " Score: ", res.data[i].score)
