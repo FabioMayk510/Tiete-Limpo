@@ -6,6 +6,7 @@ const port = 3000;
 //Configurando o path para trabalhar com diretorio
 const path = require('path');
 const axios = require("axios");
+const pool = require('./db');
 
 // Configurar o mecanismo de visualização e a pasta de visualização
 app.set('view engine', 'ejs');
@@ -17,6 +18,47 @@ app.use(express.json());
 
 module.exports = function() {
     return app;
+}
+
+pool.initialize().then(()=>{
+    console.log("Foi")
+}).catch((err)=>{
+    console.log(err)
+})
+
+//Função de conexão com banco de dados
+// pool.connect((err, client, release) => {
+//     if (err) {
+//         return console.error('Erro ao conectar ao banco de dados:', err.stack);
+//     }
+//     console.log('Conectado ao banco de dados');
+//     release();
+// });
+
+
+
+// async function consultarDados() {
+//     try {
+//         const result = await pool.query('SELECT * FROM sua_tabela');
+//         console.log(result.rows); // Aqui estão os resultados da consulta
+//     } catch (error) {
+//         console.error('Erro ao consultar dados:', error);
+//     }
+// }
+
+// consultarDados()
+
+// Função para salvar usuario no banco
+async function saveUser(name, email) {
+    const query = 'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *';
+    const values = [name, email];
+
+    try {
+        const res = await pool.query(query, values);
+        console.log('User saved:', res.rows[0]);
+    } catch (err) {
+        console.error('Error saving user:', err);
+    }
 }
 
 class Partidas{
