@@ -8,6 +8,7 @@ const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
 const { isErrored } = require('stream');
+const { sign } = require('crypto');
 // const { Task } = require('./task')
 
 // Configurar o mecanismo de visualização e a pasta de visualização
@@ -120,17 +121,17 @@ async function users(){
     }
 }
 
-// Rota padrão
-app.get('/', (req, res) => {
-    console.log(users())
-    res.render("index.ejs")
-})
+async function login(){
+    try {
+        let q = await conection.query(`SELECT nome, senha FROM users`)
+        return q
+    } catch (erro) {
+        console.log("Erro ao realizar consulta", erro)
+    }
+}
 
-app.post('/signUp', async (req, res) => {
-    nome = req.body.nome;
-    email = req.body.email;
-    senha = req.body.senha;
-    userList = await users()
+async function signUp(nome, senha, res){
+    let userList = await users()
     isEqual = false
     for (let e of userList){
         let nomeAtual = e.nome;
@@ -139,17 +140,54 @@ app.post('/signUp', async (req, res) => {
         }
     }
     if(isEqual === true){
-        res.send("Usuario ja cadastrado").status(409)
+        res.status(409).send("Usuario ja cadastrado")
     } else {
         try {
-            let q = await conection.query(`INSERT INTO users(nome, email, senha) VALUES('${nome}', '${email}', '${senha}')`)
+            let q = await conection.query(`INSERT INTO users(nome, senha) VALUES('${nome}', '${senha}')`)
             console.log("Usuario cadastrado com sucesso: ", q)
-            res.send("Usuario cadastrado com sucesso").status(200)
+            res.status(200).send("Usuario cadastrado com sucesso")
         } catch (erro) {
             console.log("Não foi possivel cadastrar usuario: ", erro)
-            res.send(erro).status(503)
+            res.status(503).send(erro)
         }
     }
+}
+
+async function signIn(nome, senha){
+    let userList = await login()
+    let isEqual = false
+    for (let e of userList){
+        let nomeAtual = e.nome;
+        if (nomeAtual.toLowerCase() === nome.toLowerCase()){
+            senhaAtual = e.senha;
+            if (senhaAtual.toLowerCase() === senha.toLowerCase()){
+                isEqual = true;
+            }
+        }
+    }
+    return isEqual === true ? 200 : 400
+}
+
+// Rota padrão
+app.get('/', (req, res) => {
+    console.log(users())
+    res.render("index.ejs")
+})
+
+app.post('/signUp', async (req, res) => {
+    nome = req.body.nome;
+    senha = req.body.senha;
+    signUp(nome, senha, res)
+})
+
+app.post('/signIn', async (req, res) => {
+    nome = req.body.nome;
+    senha = req.body.senha;
+    let code = await signIn(nome, senha)
+    code === 200 ? 
+        res.send("Login efetuado com sucesso").status(200) 
+        : 
+        res.status(401).send("Falha ao efetuar login")
 })
 
 app.post('/logs', (req, res) => {

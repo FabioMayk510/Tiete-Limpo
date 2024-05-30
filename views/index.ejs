@@ -8,13 +8,21 @@
 </head>
 <body>
     <script>
-        function signUp(nome, email, senha){
+        function signUp(nome, senha){
             axios.post('/signUp', {
                 nome: nome,
-                email: email,
                 senha: senha
             }).then(res => {
             console.log(res)
+            }).catch((err) => console.log(err))
+        }
+
+        function signIn(nome, senha){
+            axios.post('/signIn', {
+                nome: nome,
+                senha: senha
+            }).then(res => {
+                console.log(res)
             }).catch((err) => console.log(err))
         }
 
