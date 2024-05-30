@@ -14,8 +14,8 @@
                 email: email,
                 senha: senha
             }).then(res => {
-            console.log("Cadastro realizado com sucesso")
-            }).catch(() => console.log("Falha ao cadastrar usuario"))
+            console.log(res)
+            }).catch((err) => console.log(err))
         }
 
         function enviarLogs(){

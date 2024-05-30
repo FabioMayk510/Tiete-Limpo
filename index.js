@@ -7,6 +7,7 @@ const port = 3000;
 const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
+const { isErrored } = require('stream');
 // const { Task } = require('./task')
 
 // Configurar o mecanismo de visualização e a pasta de visualização
@@ -111,8 +112,9 @@ function generateLogs(log, rege) {
 
 async function users(){
     try{
-        let q = await conection.query(`SELECT * FROM users`)
+        let q = await conection.query(`SELECT nome FROM users`)
         console.log(q)
+        return q
     } catch (erro) {
         console.log("Erro ao realizar consulta: ", erro)
     }
@@ -120,6 +122,7 @@ async function users(){
 
 // Rota padrão
 app.get('/', (req, res) => {
+    console.log(users())
     res.render("index.ejs")
 })
 
@@ -127,11 +130,25 @@ app.post('/signUp', async (req, res) => {
     nome = req.body.nome;
     email = req.body.email;
     senha = req.body.senha;
-    try {
-        let q = await conection.query(`INSERT INTO users(nome, email, senha) VALUES('${nome}', '${email}', '${senha}')`)
-        console.log("Usuario cadastrado com sucesso: ", q)
-    } catch (erro) {
-        console.log("Não foi possivel cadastrar usuario: ", erro)
+    userList = await users()
+    isEqual = false
+    for (let e of userList){
+        let nomeAtual = e.nome;
+        if (nomeAtual.toLowerCase() === nome.toLowerCase()){
+            isEqual = true
+        }
+    }
+    if(isEqual === true){
+        res.send("Usuario ja cadastrado").status(409)
+    } else {
+        try {
+            let q = await conection.query(`INSERT INTO users(nome, email, senha) VALUES('${nome}', '${email}', '${senha}')`)
+            console.log("Usuario cadastrado com sucesso: ", q)
+            res.send("Usuario cadastrado com sucesso").status(200)
+        } catch (erro) {
+            console.log("Não foi possivel cadastrar usuario: ", erro)
+            res.send(erro).status(503)
+        }
     }
 })
 
