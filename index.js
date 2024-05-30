@@ -6,6 +6,7 @@ const port = 3000;
 //Configurando o path para trabalhar com diretorio
 const path = require('path');
 const axios = require("axios");
+const conection = require('./db');
 
 // Configurar o mecanismo de visualização e a pasta de visualização
 app.set('view engine', 'ejs');
@@ -18,6 +19,16 @@ app.use(express.json());
 module.exports = function() {
     return app;
 }
+
+function conect(){
+    conection.initialize().then(() => {
+        console.log("Funfooou")
+    }).catch((err) => {
+        console.log("Não funfooou ", err)
+    })
+}
+
+conect()
 
 class Partidas{
     static whatsWinner(playerOne, playerTwo, scoreOne, scoreTwo) {
