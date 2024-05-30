@@ -11,14 +11,5 @@ const conection = new DataSource({
   ssl: true
 });
 
-// function conect(){
-//   conection.initialize().then(() => {
-//       console.log("Funfooou")
-//   }).catch((err) => {
-//       console.log("Não funfooou ", err)
-//   })
-// }
-
-// conect()
 
 module.exports = conection;

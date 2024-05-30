@@ -68,6 +68,16 @@ const multi = {
 }
 var rege = [single, multi]
 
+function conect(){
+    conection.initialize().then(() => {
+        console.log("Funfooou")
+    }).catch((err) => {
+        console.log("Não funfooou ", err)
+    })
+  }
+  
+  conect()
+
 /* Função para retornar partidas SinglePlayer de um usuario */
 function verificaPartidasSingle (playerName){
     // Verificar partidas singleplayer
