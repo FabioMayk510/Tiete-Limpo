@@ -8,6 +8,7 @@ const conection = new DataSource({
   database: "tiete_limpo",
   entities: [__dirname + '/../**/*.entity.js'],
   synchronize: false,
+  ssl: true
 });
 
 module.exports = conection;
