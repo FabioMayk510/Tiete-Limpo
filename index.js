@@ -231,7 +231,7 @@ app.post('/signIn', async (req, res) => {
     let code = await signIn(nome, senha)
     // Verifica a resposta do login e retorna o codigo
     if (code === 200){
-        console.log("Logado")
+        console.log("Logadoo")
     } else {
         console.log("Deslogado")
     }
