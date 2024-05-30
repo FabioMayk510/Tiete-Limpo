@@ -1,9 +1,9 @@
+
+
+/* Import dos módulos */
 const express = require('express')
 const app = express();
 const cors = require('cors');
-const port = 3000;
-
-//Configurando o path para trabalhar com diretorio
 const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
@@ -11,29 +11,19 @@ const { isErrored } = require('stream');
 const { sign } = require('crypto');
 // const { Task } = require('./task')
 
-// Configurar o mecanismo de visualização e a pasta de visualização
+/* Configurações */
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static('public'));
 app.use(cors())
 app.use(express.urlencoded());
 app.use(express.json());
+const port = 3000;
 
+/* Export do Modulo para atualizações */
 module.exports = function() {
     return app;
 }
-
-function conect(){
-    conection.initialize().then(() => {
-        console.log("Funfooou")
-    }).catch((err) => {
-        console.log("Não funfooou ", err)
-    })
-}
-
-conect()
-
-
 
 class Partidas{
     static whatsWinner(playerOne, playerTwo, scoreOne, scoreTwo) {
@@ -66,6 +56,8 @@ class Partida extends Partidas{
 
 var partidasSingle = []
 var partidasMulti = []
+
+/* Regras para formatação dos logs */
 const single = {
     regex: /^(\w+);\s*(\w+);\s*(\w+);\s*(\d+)$/,
     format: ['mode', 'difficulty', 'player', 'score']
@@ -76,6 +68,31 @@ const multi = {
 }
 var rege = [single, multi]
 
+/* Função para retornar partidas SinglePlayer de um usuario */
+function verificaPartidasSingle (playerName){
+    // Verificar partidas singleplayer
+    singleplayer = []
+    partidasSingle.forEach(partida => {
+        if (partida.player === playerName) {
+            singleplayer.push(partida);
+        }
+    });
+    return singleplayer
+}
+
+/* Função para retornar partidas MultiPlayer de um usuario */
+function verificaPartidasMulti (playerName){
+    multiplayer = []
+    // Verificar partidas multiplayer
+    partidasMulti.forEach(partida => {
+        if (partida.playerOne === playerName || partida.playerTwo === playerName) {
+            multiplayer.push(partida);
+        }
+    });
+    return multiplayer
+}
+
+/* Cadastro das partidas */
 function generateLogs(log, rege) {
     const match = rege.regex.exec(log);
 
@@ -111,16 +128,17 @@ function generateLogs(log, rege) {
     }
 }
 
+/* Função que retorna lista com os nomes dos usuarios */
 async function users(){
     try{
         let q = await conection.query(`SELECT nome FROM users`)
-        console.log(q)
         return q
     } catch (erro) {
         console.log("Erro ao realizar consulta: ", erro)
     }
 }
 
+/* Função que retorna nome e senha dos usuarios */
 async function login(){
     try {
         let q = await conection.query(`SELECT nome, senha FROM users`)
@@ -130,69 +148,94 @@ async function login(){
     }
 }
 
+/* Função que cadastra usuarios */
 async function signUp(nome, senha, res){
+    // Recupera os nomes dos usuarios
     let userList = await users()
     isEqual = false
+    // Percorre o array de nomes e verifica se o usuario ja esta cadastrado
     for (let e of userList){
         let nomeAtual = e.nome;
         if (nomeAtual.toLowerCase() === nome.toLowerCase()){
             isEqual = true
         }
     }
+    // Se o usuario ja existir, retorna um erro 409 (Conflict)
     if(isEqual === true){
         res.status(409).send("Usuario ja cadastrado")
     } else {
+        // Se o usuario nao existir, insere-o no banco de dados e retorna status 200 (OK)
         try {
             let q = await conection.query(`INSERT INTO users(nome, senha) VALUES('${nome}', '${senha}')`)
             console.log("Usuario cadastrado com sucesso: ", q)
             res.status(200).send("Usuario cadastrado com sucesso")
         } catch (erro) {
+            // Se nao for possivel cadastrar o usuario envia status 503 (Service Unavaliable)
             console.log("Não foi possivel cadastrar usuario: ", erro)
             res.status(503).send(erro)
         }
     }
 }
 
+/* Função para logar usuario */
 async function signIn(nome, senha){
+    // Recupera lista de nomes e senhas do banco (abordagem usada pela limitada quantidade de linhas do banco usado nesta aplicação)
     let userList = await login()
     let isEqual = false
+    // Percorre a lista de usuarios verificando se o mesmo ja existe
     for (let e of userList){
         let nomeAtual = e.nome;
         if (nomeAtual.toLowerCase() === nome.toLowerCase()){
             senhaAtual = e.senha;
+            // Caso o usuario exista, verifica se a senha está correta
             if (senhaAtual.toLowerCase() === senha.toLowerCase()){
                 isEqual = true;
             }
         }
     }
-    return isEqual === true ? 200 : 400
+    // Retorna o codigo de status 200 (OK) ou 401 (Unauthorized), a depender da consulta
+    return isEqual === true ? 200 : 401
 }
 
-// Rota padrão
+/* Rota padrão (Talvez será usada para hospedar o jogo) */
 app.get('/', (req, res) => {
     console.log(users())
     res.render("index.ejs")
 })
 
+/* Rota de cadastro do usuario */
 app.post('/signUp', async (req, res) => {
+    // Recebe nome e senha
     nome = req.body.nome;
     senha = req.body.senha;
+    // Envia para função de cadastro
     signUp(nome, senha, res)
 })
 
+/* Rota de login do usuario */
 app.post('/signIn', async (req, res) => {
+    // Recebe nome e senha
     nome = req.body.nome;
     senha = req.body.senha;
+    // Envia para função de login
     let code = await signIn(nome, senha)
+    // Verifica a resposta do login e retorna o codigo
+    if (code === 200){
+        console.log("Logado")
+    } else {
+        console.log("Deslogado")
+    }
     code === 200 ? 
-        res.send("Login efetuado com sucesso").status(200) 
+        res.send("Login efetuado com sucesso").status(code) 
         : 
-        res.status(401).send("Falha ao efetuar login")
+        res.status(code).send("Falha ao efetuar login")
 })
 
+/* Rota para receber logs da partida */
 app.post('/logs', (req, res) => {
     log = req.body.log //SinglePlayer; Hard; Fabio; 3300
 
+    // Envia o log recebido com todos os regex pre-definidos, ate encontrar o correspondente e cadastra-o
     let i = 0
     while(generateLogs(log, rege[i]) == 1){
         i++
@@ -200,38 +243,19 @@ app.post('/logs', (req, res) => {
     res.json("funfou");
 })
 
-function verificaPartidasSingle (playerName){
-    // Verificar partidas singleplayer
-    singleplayer = []
-    partidasSingle.forEach(partida => {
-        if (partida.player === playerName) {
-            singleplayer.push(partida);
-        }
-    });
-    return singleplayer
-}
-
-function verificaPartidasMulti (playerName){
-    multiplayer = []
-    // Verificar partidas multiplayer
-    partidasMulti.forEach(partida => {
-        if (partida.playerOne === playerName || partida.playerTwo === playerName) {
-            multiplayer.push(partida);
-        }
-    });
-    return multiplayer
-}
-
+/* Rpta para retornar as partidas MultiPlayer de um usuario */
 app.get('/logsMultiByName', (req, res) => {
     const playerName = req.query.name;
     res.json(verificaPartidasMulti(playerName))
 })
 
+/* Rota para retornar as partidas SinglePlayer de um usuario */
 app.get('/logsSingleByName', (req, res) => {
     const playerName = req.query.name;
     res.json(verificaPartidasSingle(playerName))
 })
 
+/* Rota para retornar todas as partidas (SinglePlayer e MultiPlayer) de um usuario */
 app.get('/logsByName', (req, res) => {
     const playerName = req.query.name;
     const playerPartidas = {
@@ -241,10 +265,12 @@ app.get('/logsByName', (req, res) => {
     res.json(playerPartidas);
 });
 
-
+/* Rota para retornar placar de scores */
 app.get('/logsByScore', (req, res) => {
+    // Ordena os dados por pontuação decrescente
     const dadosOrdenados = partidasSingle.sort((a, b) => b.score - a.score);
     console.log(dadosOrdenados)
+    // Retorna os dados
     res.json(dadosOrdenados)
 })
 
