@@ -6,7 +6,7 @@ const conection = new DataSource({
   username: "admin",
   password: "IbOLF90ge6B9be0cjXxALZa9hXIyMzIk",
   database: "tiete_limpo",
-  entities: [__dirname + '/../**/*.entity.js'],
+  // entities: './task.js',
   synchronize: false,
   ssl: true
 });

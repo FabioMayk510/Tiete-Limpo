@@ -7,6 +7,7 @@ const port = 3000;
 const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
+// const { Task } = require('./task')
 
 // Configurar o mecanismo de visualização e a pasta de visualização
 app.set('view engine', 'ejs');
@@ -29,6 +30,8 @@ function conect(){
 }
 
 conect()
+
+
 
 class Partidas{
     static whatsWinner(playerOne, playerTwo, scoreOne, scoreTwo) {
@@ -106,11 +109,30 @@ function generateLogs(log, rege) {
     }
 }
 
-
+async function users(){
+    try{
+        let q = await conection.query(`SELECT * FROM users`)
+        console.log(q)
+    } catch (erro) {
+        console.log("Erro ao realizar consulta: ", erro)
+    }
+}
 
 // Rota padrão
 app.get('/', (req, res) => {
     res.render("index.ejs")
+})
+
+app.post('/signUp', async (req, res) => {
+    nome = req.body.nome;
+    email = req.body.email;
+    senha = req.body.senha;
+    try {
+        let q = await conection.query(`INSERT INTO users(nome, email, senha) VALUES('${nome}', '${email}', '${senha}')`)
+        console.log("Usuario cadastrado com sucesso: ", q)
+    } catch (erro) {
+        console.log("Não foi possivel cadastrar usuario: ", erro)
+    }
 })
 
 app.post('/logs', (req, res) => {

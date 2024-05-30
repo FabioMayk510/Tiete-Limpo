@@ -8,6 +8,16 @@
 </head>
 <body>
     <script>
+        function signUp(nome, email, senha){
+            axios.post('/signUp', {
+                nome: nome,
+                email: email,
+                senha: senha
+            }).then(res => {
+            console.log("Cadastro realizado com sucesso")
+            }).catch(() => console.log("Falha ao cadastrar usuario"))
+        }
+
         function enviarLogs(){
             let logs = "SinglePlayer; Hard; Fabio; 3300"
             recebeLogs(logs)
