@@ -38,7 +38,6 @@ const cors = require('cors');
 const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
-const { isErrored } = require('stream');
 const { sign } = require('crypto');
 // const { Task } = require('./task')
 
