@@ -55,11 +55,11 @@ module.exports = function() {
     return app;
 }
 
-pool.initialize().then(()=>{
-    console.log("Foi")
-}).catch((err)=>{
-    console.log(err)
-})
+// conection.initialize().then(()=>{
+//     console.log("Conectado ao banco de dados")
+// }).catch((err)=>{
+//     console.log(err)
+// })
 
 //Função de conexão com banco de dados
 // pool.connect((err, client, release) => {
@@ -84,17 +84,17 @@ pool.initialize().then(()=>{
 // consultarDados()
 
 // Função para salvar usuario no banco
-async function saveUser(name, email) {
-    const query = 'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *';
-    const values = [name, email];
+// async function saveUser(name, email) {
+//     const query = 'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *';
+//     const values = [name, email];
 
-    try {
-        const res = await pool.query(query, values);
-        console.log('User saved:', res.rows[0]);
-    } catch (err) {
-        console.error('Error saving user:', err);
-    }
-}
+//     try {
+//         const res = await conection.query(query, values);
+//         console.log('User saved:', res.rows[0]);
+//     } catch (err) {
+//         console.error('Error saving user:', err);
+//     }
+// }
 
 class Partidas{
     static whatsWinner(playerOne, playerTwo, scoreOne, scoreTwo) {
@@ -142,9 +142,9 @@ var rege = [single, multi]
 /* Função para estabelecer a conexão com o banco de dados */
 function conect(){
     conection.initialize().then(() => {
-        console.log("Funfooou")
+        console.log("Conectado ao banco de dados")
     }).catch((err) => {
-        console.log("Não funfooou ", err)
+        console.log("Falha ao conectar com o banco de dados", err)
     })
   }
   
