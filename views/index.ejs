@@ -8,9 +8,26 @@
 </head>
 <body>
     <script>
+        function signUp(nome, senha){
+            axios.post('/signUp', {
+                nome: nome,
+                senha: senha
+            }).then(res => {
+            console.log(res)
+            }).catch((err) => console.log(err))
+        }
+
+        function signIn(nome, senha){
+            axios.post('/signIn', {
+                nome: nome,
+                senha: senha
+            }).then(res => {
+                console.log(res)
+            }).catch((err) => console.log(err))
+        }
+
         function enviarLogs(){
-            let logs = "SinglePlayer; Hard; Fabio; 3300"
-            recebeLogs(logs)
+            recebeLogs("Username", 3300)
         }
 
         function enviarMultiLogs(){
@@ -18,16 +35,17 @@
             recebeLogs(logs)
         }
 
-        function recebeLogs(logs){
-            axios.post('https://tiete-limpo.onrender.com/logs', {
-                log: logs
+        function recebeLogs(nome, score){
+            axios.post('/logsSingle', {
+                nome: nome,
+                score: score
             }).then(res => {
-            console.log("Funfou")
-            }).catch(() => console.log("Não Funfou"))
+            console.log(res)
+            }).catch(() => console.log(res))
         }
 
         function retornaLogsByName(name){
-            axios.get('https://tiete-limpo.onrender.com/logsByName', {
+            axios.get('/logsByName', {
                 params: {
                     name: name
                 }
@@ -37,7 +55,7 @@
         }
 
         function retornaSingleByName(name){
-            axios.get('https://tiete-limpo.onrender.com/logsSingleByName', {
+            axios.get('/logsSingleByName', {
                 params: {
                     name: name
                 }
@@ -47,7 +65,7 @@
         }
 
         function retornaMultiByName(name){
-            axios.get('https://tiete-limpo.onrender.com/logsMultiByName', {
+            axios.get('/logsMultiByName', {
                 params: {
                     name: name
                 }
@@ -57,10 +75,10 @@
         }
 
         function logsByScore(){
-            axios.get('https://tiete-limpo.onrender.com/logsByScore').then(
+            axios.get('/logsByScore').then(
                 res => {
                     for(let i = 0; i < res.data.length; i++){
-                        console.log("Player: ", res.data[i].player, " Score: ", res.data[i].score)
+                        console.log("Player: ", res.data[i].nome, " Score: ", res.data[i].score)
                     }
                 }
             )
