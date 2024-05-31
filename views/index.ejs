@@ -27,8 +27,7 @@
         }
 
         function enviarLogs(){
-            let logs = "SinglePlayer; Hard; Fabio; 3300"
-            recebeLogs(logs)
+            recebeLogs("Username", 3300)
         }
 
         function enviarMultiLogs(){
@@ -36,12 +35,13 @@
             recebeLogs(logs)
         }
 
-        function recebeLogs(logs){
-            axios.post('/logs', {
-                log: logs
+        function recebeLogs(nome, score){
+            axios.post('/logsSingle', {
+                nome: nome,
+                score: score
             }).then(res => {
-            console.log("Funfou")
-            }).catch(() => console.log("Não Funfou"))
+            console.log(res)
+            }).catch(() => console.log(res))
         }
 
         function retornaLogsByName(name){
@@ -78,7 +78,7 @@
             axios.get('/logsByScore').then(
                 res => {
                     for(let i = 0; i < res.data.length; i++){
-                        console.log("Player: ", res.data[i].player, " Score: ", res.data[i].score)
+                        console.log("Player: ", res.data[i].nome, " Score: ", res.data[i].score)
                     }
                 }
             )

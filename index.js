@@ -89,15 +89,16 @@ var partidasMulti = []
 
 /* Regras para formatação dos logs */
 const single = {
-    regex: /^(\w+);\s*(\w+);\s*(\w+);\s*(\d+)$/,
-    format: ['mode', 'difficulty', 'player', 'score']
+    regex: /^(\w+);\s*(\d+)$/,
+    format: ['player', 'score']
 }
 const multi = {
-    regex: /^(\w+);\s*(\w+);\s*(\w+);\s*(\w+);\s*(\d+);\s*(\d+)$/,
-    format: ['mode', 'difficulty', 'playerOne', 'playerTwo', 'scoreOne', 'scoreTwo']
+    regex: /^(\w+);\s*(\w+);\s*(\d+);\s*(\d+)$/,
+    format: ['playerOne', 'playerTwo', 'scoreOne', 'scoreTwo']
 }
 var rege = [single, multi]
 
+/* Função para estabelecer a conexão com o banco de dados */
 function conect(){
     conection.initialize().then(() => {
         console.log("Funfooou")
@@ -132,40 +133,54 @@ function verificaPartidasMulti (playerName){
     return multiplayer
 }
 
-/* Cadastro das partidas */
-function generateLogs(log, rege) {
-    const match = rege.regex.exec(log);
-
-    if (match) {
-        // Extrair os nomes das variáveis do objeto rege.format
-        let format = rege.format.map(item => item);
-
-        // Remover a primeira posição de match, que é a string completa da partida
-        const valores = match.slice(1);
-
-        // Verificar se já existe um registro para o player no array partidasSingle
-        const playerIndex = partidasSingle.findIndex(partida => partida.player === valores[format.indexOf('player')]);
-
-        if (playerIndex !== -1) {
-            // Se o jogador já existir, verificar se o novo score é maior
-            const currentScore = parseInt(valores[format.indexOf('score')]);
-            const existingScore = parseInt(partidasSingle[playerIndex].score);
-
-            if (currentScore > existingScore) {
-                // Se o novo score for maior, atualizar a partida existente
-                partidasSingle[playerIndex] = new Partida(format, valores);
-            }
-            console.log("ja existe")
-        } else {
-            // Se o jogador não existir, criar uma nova partida
-            let partida = new Partida(format, valores);
-            partidasSingle.push(partida);
-        }
-
-        return 0;
-    } else {
-        return 1;
+/* Função para inserir partidas SP */
+async function insert(nome, score){
+    try {
+        let q = await conection.query(`INSERT INTO singleplayer(nome, score) VALUES('${nome}', ${score})`)
+        return 200
+    } catch (erro) {
+        console.log("Erro ao cadastrar partida: ", erro)
+        return 503
     }
+}
+
+/* Função para atualizar partidas SP*/
+async function update(nome, score){
+    try {
+        let q = await conection.query(`UPDATE singleplayer SET score = ${score} WHERE nome = '${nome}'`)
+        return 200
+    } catch (erro) {
+        console.log("Erro ao atualizar partida: ", erro)
+        return 503
+    }
+}
+
+/* Função para listar partidas SP */
+async function listaSingle(){
+    try {
+        let q = await conection.query(`SELECT nome, score FROM singleplayer`)
+        return q
+    } catch (erro) {
+        console.log("Falha ao consultar base de Partidas Single")
+        return erro
+    }
+}
+
+/* Função para retornar partidas SinglePlayer por nome*/
+async function partidaSingle(nome){
+    try {
+        let q = await conection.query(`SELECT nome, score FROM singleplayer WHERE nome = '${nome}'`)
+        return q
+    } catch (erro) {
+        console.log("Falha ao consultar base de Partidas Single")
+        return erro
+    }
+}
+
+/* Cadastro das partidas */
+async function generateLogs(nome, score) {
+    let r = await partidaSingle(nome)
+    return r.length === 1 ? await update(nome, score > r[0].score ? score : r[0].score) : await insert(nome, score)
 }
 
 /* Função que retorna lista com os nomes dos usuarios */
@@ -238,8 +253,8 @@ async function signIn(nome, senha){
 }
 
 /* Rota padrão (Talvez será usada para hospedar o jogo) */
-app.get('/', (req, res) => {
-    console.log(users())
+app.get('/', async (req, res) => {
+    console.log(await users())
     res.render("index.ejs")
 })
 
@@ -260,11 +275,9 @@ app.post('/signIn', async (req, res) => {
     // Envia para função de login
     let code = await signIn(nome, senha)
     // Verifica a resposta do login e retorna o codigo
-    if (code === 200){
-        console.log("Logadoo")
-    } else {
-        console.log("Deslogado")
-    }
+    if (code === 200)
+        console.log("Login Efetuado com Sucesso")
+    
     code === 200 ? 
         res.send("Login efetuado com sucesso").status(code) 
         : 
@@ -272,15 +285,14 @@ app.post('/signIn', async (req, res) => {
 })
 
 /* Rota para receber logs da partida */
-app.post('/logs', (req, res) => {
-    log = req.body.log //SinglePlayer; Hard; Fabio; 3300
-
-    // Envia o log recebido com todos os regex pre-definidos, ate encontrar o correspondente e cadastra-o
-    let i = 0
-    while(generateLogs(log, rege[i]) == 1){
-        i++
-    }
-    res.json("funfou");
+app.post('/logsSingle', async (req, res) => {
+    nome = req.body.nome;
+    score = parseInt(req.body.score);
+    let code = await generateLogs(nome, score)
+    code === 200 ? 
+        res.send("Partida cadastrada com sucesso").status(code) 
+        : 
+        res.status(code).send("Falha ao cadastrar partida")
 })
 
 /* Rpta para retornar as partidas MultiPlayer de um usuario */
@@ -306,9 +318,10 @@ app.get('/logsByName', (req, res) => {
 });
 
 /* Rota para retornar placar de scores */
-app.get('/logsByScore', (req, res) => {
+app.get('/logsByScore', async (req, res) => {
     // Ordena os dados por pontuação decrescente
-    const dadosOrdenados = partidasSingle.sort((a, b) => b.score - a.score);
+    p = await listaSingle()
+    const dadosOrdenados = p.sort((a, b) => b.score - a.score);
     console.log(dadosOrdenados)
     // Retorna os dados
     res.json(dadosOrdenados)
