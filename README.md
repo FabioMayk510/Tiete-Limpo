@@ -11,7 +11,7 @@ Repositório destinado ao projeto da APS do curso Sistemas da Informação
 
 ## Requisitos
 
-- NodeJs e PostgresSQL
+- NodeJs e PostgresSQL 
 
 ## Siga para a instalação
 
