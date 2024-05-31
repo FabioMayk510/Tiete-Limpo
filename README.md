@@ -6,7 +6,7 @@ Repositório destinado ao projeto da APS do curso Sistemas da Informação
 ### SinglePlayer
 {Player}; {Pontuação}
 
-### multiPlayer
+### MultiPlayer
 {Player 1}; {Player 2}; {Pontuação P1}; {Pontuação P2}
 
 ## Requisitos
