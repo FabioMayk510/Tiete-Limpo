@@ -55,91 +55,50 @@ module.exports = function() {
     return app;
 }
 
-// conection.initialize().then(()=>{
-//     console.log("Conectado ao banco de dados")
-// }).catch((err)=>{
-//     console.log(err)
-// })
-
-//Função de conexão com banco de dados
-// pool.connect((err, client, release) => {
-//     if (err) {
-//         return console.error('Erro ao conectar ao banco de dados:', err.stack);
+// class Partidas{
+//     static whatsWinner(playerOne, playerTwo, scoreOne, scoreTwo) {
+//         return parseInt(scoreOne) > parseInt(scoreTwo) ? playerOne : playerTwo;
 //     }
-//     console.log('Conectado ao banco de dados');
-//     release();
-// });
 
-
-
-// async function consultarDados() {
-//     try {
-//         const result = await pool.query('SELECT * FROM sua_tabela');
-//         console.log(result.rows); // Aqui estão os resultados da consulta
-//     } catch (error) {
-//         console.error('Erro ao consultar dados:', error);
+//     resumo(){
+//         if(this.mode === "SinglePlayer"){
+//             console.log("Modo: ", this.mode, "\nPlayer: ", this.player, "\nScore: ", this.score, "\nDifficulty: ", this.difficulty)
+//         } else if(this.mode === "MultiPlayer"){
+//             console.log("Modo: ", this.mode, "\nPlayer 1: ", this.playerOne, "\nPlayer 2: ", this.playerTwo, "\nScore Player 1: ", this.scoreOne, "\nScore Player 2: ", this.scoreTwo,"\nDifficulty: ", this.difficulty, "\nWinner: ", Partidas.whatsWinner(this.playerOne, this.playerTwo, this.scoreOne, this.scoreTwo))
+//         }
 //     }
 // }
 
-// consultarDados()
-
-// Função para salvar usuario no banco
-// async function saveUser(name, email) {
-//     const query = 'INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *';
-//     const values = [name, email];
-
-//     try {
-//         const res = await conection.query(query, values);
-//         console.log('User saved:', res.rows[0]);
-//     } catch (err) {
-//         console.error('Error saving user:', err);
-//     }
-// }
-
-class Partidas{
-    static whatsWinner(playerOne, playerTwo, scoreOne, scoreTwo) {
-        return parseInt(scoreOne) > parseInt(scoreTwo) ? playerOne : playerTwo;
-    }
-
-    resumo(){
-        if(this.mode === "SinglePlayer"){
-            console.log("Modo: ", this.mode, "\nPlayer: ", this.player, "\nScore: ", this.score, "\nDifficulty: ", this.difficulty)
-        } else if(this.mode === "MultiPlayer"){
-            console.log("Modo: ", this.mode, "\nPlayer 1: ", this.playerOne, "\nPlayer 2: ", this.playerTwo, "\nScore Player 1: ", this.scoreOne, "\nScore Player 2: ", this.scoreTwo,"\nDifficulty: ", this.difficulty, "\nWinner: ", Partidas.whatsWinner(this.playerOne, this.playerTwo, this.scoreOne, this.scoreTwo))
-        }
-    }
-}
-
-class Partida extends Partidas{
-    constructor(format, match){
-        super()
-        for(let i = 0; i < match.length; i++){
-            this[format[i]] = match[i]
-        }
-        if(this.mode === "SinglePlayer")
-            console.log()
-        else if(this.mode === "MultiPlayer")
-            this.winner = Partidas.whatsWinner(this.playerOne, this.playerTwo, this.scoreOne, this.scoreTwo)
-            partidasMulti.push(this)
+// class Partida extends Partidas{
+//     constructor(format, match){
+//         super()
+//         for(let i = 0; i < match.length; i++){
+//             this[format[i]] = match[i]
+//         }
+//         if(this.mode === "SinglePlayer")
+//             console.log()
+//         else if(this.mode === "MultiPlayer")
+//             this.winner = Partidas.whatsWinner(this.playerOne, this.playerTwo, this.scoreOne, this.scoreTwo)
+//             partidasMulti.push(this)
         
-    }
-}
+//     }
+// }
 
-var partidasSingle = []
-var partidasMulti = []
+// var partidasSingle = []
+// var partidasMulti = []
 
-/* Regras para formatação dos logs */
-const single = {
-    regex: /^(\w+);\s*(\d+)$/,
-    format: ['player', 'score']
-}
-const multi = {
-    regex: /^(\w+);\s*(\w+);\s*(\d+);\s*(\d+)$/,
-    format: ['playerOne', 'playerTwo', 'scoreOne', 'scoreTwo']
-}
-var rege = [single, multi]
+// /* Regras para formatação dos logs */
+// const single = {
+//     regex: /^(\w+);\s*(\d+)$/,
+//     format: ['player', 'score']
+// }
+// const multi = {
+//     regex: /^(\w+);\s*(\w+);\s*(\d+);\s*(\d+)$/,
+//     format: ['playerOne', 'playerTwo', 'scoreOne', 'scoreTwo']
+// }
+// var rege = [single, multi]
 
-/* Função para estabelecer a conexão com o banco de dados */
+/* Função para verificar a conexão com o banco de dados */
 function conect(){
     conection.initialize().then(() => {
         console.log("Conectado ao banco de dados")
@@ -177,6 +136,7 @@ function verificaPartidasMulti (playerName){
 /* Função para inserir partidas SP */
 async function insert(nome, score){
     try {
+        console.log("Score: ", score)
         let q = await conection.query(`INSERT INTO singleplayer(nome, score) VALUES('${nome}', ${score})`)
         return 200
     } catch (erro) {
@@ -328,7 +288,8 @@ app.post('/signIn', async (req, res) => {
 /* Rota para receber logs da partida */
 app.post('/logsSingle', async (req, res) => {
     nome = req.body.nome;
-    score = parseInt(req.body.score);
+    score = req.body.score;
+    score = parseInt(score);
     let code = await generateLogs(nome, score)
     code === 200 ? 
         res.send("Partida cadastrada com sucesso").status(code) 
@@ -370,5 +331,5 @@ app.get('/logsByScore', async (req, res) => {
 
 // Iniciar o servidor
 app.listen(port, () => {
-    console.log(`Servidor iniciado em http://10.10.24.159:${port}`);
+    console.log(`Servidor iniciado.`);
 });
