@@ -324,9 +324,10 @@ app.get('/logsByScore', async (req, res) => {
     // Ordena os dados por pontuação decrescente
     p = await listaSingle()
     const dadosOrdenados = p.sort((a, b) => b.score - a.score);
-    console.log(dadosOrdenados)
+    novosDados = dadosOrdenados.slice(0, 5)
+    console.log(novosDados)
     // Retorna os dados
-    res.json(dadosOrdenados)
+    res.json(novosDados)
 })
 
 // Iniciar o servidor
