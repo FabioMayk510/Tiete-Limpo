@@ -325,7 +325,7 @@ app.get('/logsByScore', async (req, res) => {
     p = await listaSingle()
     const dadosOrdenados = p.sort((a, b) => b.score - a.score);
     novosDados = dadosOrdenados.slice(0, 5)
-    console.log(novosDados)
+    console.log(novosDados);
     // Retorna os dados
     res.json(novosDados)
 })
