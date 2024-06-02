@@ -311,7 +311,7 @@ app.post('/loop', async (req, res) => {
     let host = req.body.nome;
     //let nome = req.body.username;
     let q = await conection.query(`SELECT p1 FROM rooms WHERE host = '${host}'`)
-    if(q[0].p1 === null){
+    if(q[0].p1 == null){
         console.log("ta nulo")
         res.send("Nao ha players")
     } else {
