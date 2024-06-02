@@ -296,6 +296,7 @@ app.post('/createRoom', async (req, res) => {
 app.post('/searchRoom', async (req, res) => {
     let host = req.body.nome;
     let senha = req.body.senha;
+    console.log("Host: ", host, " Senha: ", senha)
     let q = await conection.query(`SELECT host, senha, hex FROM rooms WHERE host = '${host}' AND senha = '${senha}'`)
     q[0] === undefined ? res.status(401).send("Sala incorreta") : res.send(q[0])
 })
