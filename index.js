@@ -39,6 +39,7 @@ const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
 const crypto = require('crypto');
+const { IsNull } = require('typeorm');
 
 // const { Task } = require('./task')
 
@@ -281,11 +282,10 @@ app.get('/', async (req, res) => {
 app.post('/createRoom', async (req, res) => {
     let host = req.body.nome;
     let senha = req.body.senha;
-    let nome = req.body.username;
     const hex = gerarHexadecimalAleatorio(10);
 
     try {
-        let q = await conection.query(`INSERT INTO rooms(host, senha, hex, nome) VALUES('${host}', '${senha}', '${hex}', '${nome}')`)
+        let q = await conection.query(`INSERT INTO rooms(host, senha, hex) VALUES('${host}', '${senha}', '${hex}')`)
         res.send(hex)
     } catch(erro){
         console.log(erro)
@@ -295,8 +295,36 @@ app.post('/createRoom', async (req, res) => {
 
 app.post('/searchRoom', async (req, res) => {
     let host = req.body.nome;
-    let q = await conection.query(`SELECT host, senha, hex FROM rooms WHERE host = '${host}'`)
-    res.send(q[0])
+    let senha = req.body.senha;
+    let q = await conection.query(`SELECT host, senha, hex FROM rooms WHERE host = '${host}' AND senha = '${senha}'`)
+    q[0] === undefined ? res.status(401).send("Sala incorreta") : res.send(q[0])
+})
+
+app.post('/over', async (req, res) => {
+    let host = req.body.nome;
+    let p = req.body.username;
+    let score = req.body.score;
+    let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
+    if(q[0].p1 === null){
+        let q = await conection.query(`UPDATE rooms SET p1 = '${p}', scorep1 = ${score} WHERE host = '${host}'`)
+    } else {
+        let q = await conection.query(`UPDATE rooms SET p2 = '${p}', scorep2 = ${score} WHERE host = '${host}'`)
+    }
+})
+
+app.post('/endGame', async (req, res) => {
+    let host = req.body.nome;
+    let p = req.body.username;
+    let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
+    if(q[0].p1 === p){
+        let r = {"nome": q[0].p2,
+                "score": q[0].scorep2}
+        res.send(r)
+    } else {
+        let r = {"nome": q[0].p1,
+                "score": q[0].scorep1}
+        res.send(r)
+    }
 })
 
 /* Rota de cadastro do usuario */

@@ -89,7 +89,8 @@
         function newRoom(){
             axios.post('/createRoom', {
                 nome: "Fabio",
-                senha: "teste"
+                senha: "teste",
+                username: "Maykfabio10"
             }).then(res => {
                 console.log(res)
             })
@@ -97,7 +98,27 @@
 
         function searchRoom(){
             axios.post('/searchRoom', {
-                hex: "Fabio"
+                nome: "Fabio",
+                senha: "teste"
+            }).then(res => {
+                console.log(res)
+            })
+        }
+
+        function over(){
+            axios.post('/over', {
+                nome: "Fabio",
+                username: "Maykfabio10",
+                score: 15
+            }).then(res => {
+                console.log(res)
+            })
+        }
+
+        function endGame(){
+            axios.post('/endGame', {
+                nome: "Fabio",
+                username: "Maykfabio10"
             }).then(res => {
                 console.log(res)
             })
