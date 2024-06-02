@@ -124,6 +124,14 @@
                 console.log(res)
             })
         }
+
+        function loop(){
+            axios.post('/loop', {
+                nome: "Fabio"
+            }).then(res => {
+                console.log(res)
+            })
+        }
     </script>
     <h1>FABIN NA VOZ</h1>
 </body>

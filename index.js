@@ -307,6 +307,19 @@ app.post('/searchRoom', async (req, res) => {
     }
 })
 
+app.post('/loop', async (req, res) => {
+    let host = req.body.nome;
+    //let nome = req.body.username;
+    let q = await conection.query(`SELECT p1 FROM rooms WHERE host = '${host}'`)
+    if(q[0].p1 === null){
+        console.log("ta nulo")
+        res.send("Nao ha players")
+    } else {
+        console.log("Alguem entrou")
+        res.send("Player logado")
+    }
+})
+
 app.post('/over', async (req, res) => {
     let host = req.body.nome;
     let p = req.body.username;
