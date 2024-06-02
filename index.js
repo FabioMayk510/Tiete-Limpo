@@ -337,7 +337,8 @@ app.post('/loop', async (req, res) => {
     const pollDatabase = async () => {
         const conditionMet = await checkDatabaseCondition(host);
         if (conditionMet) {
-            res.json("Player logado");
+            let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
+            res.json(q0)
         } else {
             // Se a condição não foi atendida, continue verificando
             setTimeout(pollDatabase, 1000); // Esperar 1 segundo antes de verificar novamente
@@ -365,7 +366,7 @@ app.post('/over', async (req, res) => {
         const conditionMet = await checkDatabaseCondition2(host);
         if (conditionMet) {
             let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
-            res.json(q[0])
+            res.json(q0)
         } else {
             // Se a condição não foi atendida, continue verificando
             setTimeout(pollDatabase2, 1000); // Esperar 1 segundo antes de verificar novamente
