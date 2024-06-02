@@ -279,6 +279,8 @@ app.get('/', async (req, res) => {
     res.render("index.ejs")
 })
 
+
+
 app.post('/createRoom', async (req, res) => {
     let host = req.body.nome;
     let senha = req.body.senha;
@@ -318,6 +320,17 @@ async function checkDatabaseCondition(host) {
     }
 }
 
+async function checkDatabaseCondition2(host) {
+    const q = await conection.query(`SELECT p1, p2, scorep1, scorep2 FROM rooms WHERE host = $1`, [host]);
+    console.log(q)
+    if(q[0].p1 == null || q[0].p2 == null){
+        console.log("ta nulo")
+    } else {
+        console.log("Partida finalizada")
+        return q
+    }
+}
+
 app.post('/loop', async (req, res) => {
     let host = req.body.nome;
 
@@ -342,11 +355,23 @@ app.post('/over', async (req, res) => {
     let p = req.body.username;
     let score = req.body.score;
     let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
-    if(q[0].p1 === null){
+    if(q[0].p1 === null || q[0].p1 === p){
         let q = await conection.query(`UPDATE rooms SET p1 = '${p}', scorep1 = ${score} WHERE host = '${host}'`)
     } else {
         let q = await conection.query(`UPDATE rooms SET p2 = '${p}', scorep2 = ${score} WHERE host = '${host}'`)
     }
+
+    const pollDatabase2 = async () => {
+        const conditionMet = await checkDatabaseCondition2(host);
+        if (conditionMet) {
+            res.json("Partida Finalizada");
+        } else {
+            // Se a condição não foi atendida, continue verificando
+            setTimeout(pollDatabase2, 1000); // Esperar 1 segundo antes de verificar novamente
+        }
+    };
+
+    pollDatabase2();
 })
 
 app.post('/endGame', async (req, res) => {

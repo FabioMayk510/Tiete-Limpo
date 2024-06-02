@@ -106,11 +106,11 @@
             })
         }
 
-        function over(){
+        function over(host, user, score){
             axios.post('/over', {
-                nome: "Fabio",
-                username: "Maykfabio10",
-                score: 15
+                nome: host,
+                username: user,
+                score: score
             }).then(res => {
                 console.log(res)
             })
