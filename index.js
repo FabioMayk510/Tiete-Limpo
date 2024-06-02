@@ -364,7 +364,8 @@ app.post('/over', async (req, res) => {
     const pollDatabase2 = async () => {
         const conditionMet = await checkDatabaseCondition2(host);
         if (conditionMet) {
-            res.json("Partida Finalizada");
+            let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
+            res.json(q[0])
         } else {
             // Se a condição não foi atendida, continue verificando
             setTimeout(pollDatabase2, 1000); // Esperar 1 segundo antes de verificar novamente
