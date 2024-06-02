@@ -323,7 +323,7 @@ async function checkDatabaseCondition(host) {
 async function checkDatabaseCondition2(host) {
     const q = await conection.query(`SELECT p1, p2, scorep1, scorep2 FROM rooms WHERE host = $1`, [host]);
     console.log(q)
-    if(q[0].p1 == null || q[0].p2 == null){
+    if(q[0].p1 == null || q[0].p2 == null || q[0].scorep1 == null || q[0].scorep2 == null){
         console.log("ta nulo")
     } else {
         console.log("Partida finalizada")
@@ -356,6 +356,7 @@ app.post('/over', async (req, res) => {
     let p = req.body.username;
     let score = req.body.score;
     let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
+    console.log("Test: ", q)
     if(q[0].p1 === null || q[0].p1 === p){
         let q = await conection.query(`UPDATE rooms SET p1 = '${p}', scorep1 = ${score} WHERE host = '${host}'`)
     } else {
@@ -366,7 +367,9 @@ app.post('/over', async (req, res) => {
         const conditionMet = await checkDatabaseCondition2(host);
         if (conditionMet) {
             let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
-            res.json(q)
+            let ret = [q[0].p1, q[0].scorep1, q[0].p2, q[0].scorep2]
+            console.log(ret)
+            res.json(ret)
         } else {
             // Se a condição não foi atendida, continue verificando
             setTimeout(pollDatabase2, 1000); // Esperar 1 segundo antes de verificar novamente
