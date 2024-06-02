@@ -96,9 +96,9 @@
             })
         }
 
-        function searchRoom(){
+        function searchRoom(host){
             axios.post('/searchRoom', {
-                nome: "mojang",
+                nome: host,
                 senha: "123",
                 username: "Cleber"
             }).then(res => {
