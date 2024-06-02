@@ -40,6 +40,7 @@ const axios = require("axios");
 const conection = require('./db');
 const crypto = require('crypto');
 const { IsNull } = require('typeorm');
+const { connect } = require('http2');
 
 // const { Task } = require('./task')
 
@@ -369,6 +370,7 @@ app.post('/over', async (req, res) => {
             let q = await conection.query(`SELECT * FROM rooms WHERE host = '${host}'`)
             let ret = [q[0].p1, q[0].scorep1, q[0].p2, q[0].scorep2]
             console.log(ret)
+            let k = await conection.query(`DELETE FROM rooms WHERE host = '${host}'`)
             res.json(ret)
         } else {
             // Se a condição não foi atendida, continue verificando
@@ -420,6 +422,11 @@ app.post('/signIn', async (req, res) => {
         res.status(code).send("Falha ao efetuar login")
 })
 
+async function deleteS(res, code){
+    await conection.query(`DELETE FROM singleplayer WHERE id IN (SELECT id FROM (SELECT id, ROW_NUMBER() OVER (PARTITION BY nome, score ORDER BY id) AS rnum FROM singleplayer) t WHERE t.rnum > 1);`); 
+    res.send("Partida cadastrada com sucesso").status(code) 
+}
+
 /* Rota para receber logs da partida */
 app.post('/logsSingle', async (req, res) => {
     nome = req.body.nome;
@@ -427,7 +434,7 @@ app.post('/logsSingle', async (req, res) => {
     score = parseInt(score);
     let code = await generateLogs(nome, score)
     code === 200 ? 
-        res.send("Partida cadastrada com sucesso").status(code) 
+        await deleteS(res, code)
         : 
         res.status(code).send("Falha ao cadastrar partida")
 })
