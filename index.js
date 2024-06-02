@@ -38,7 +38,8 @@ const cors = require('cors');
 const path = require('path');
 const axios = require("axios");
 const conection = require('./db');
-const { sign } = require('crypto');
+const crypto = require('crypto');
+
 // const { Task } = require('./task')
 
 /* Configurações */
@@ -253,10 +254,42 @@ async function signIn(nome, senha){
     return isEqual === true ? 200 : 401
 }
 
+function gerarHexadecimalAleatorio(digitos) {
+    // Calcula o número de bytes necessários (1 byte = 2 dígitos hexadecimais)
+    const bytesNecessarios = Math.ceil(digitos / 2);
+  
+    // Gera bytes aleatórios
+    const bytesAleatorios = crypto.randomBytes(bytesNecessarios);
+  
+    // Converte os bytes para uma string hexadecimal
+    let hexadecimalAleatorio = bytesAleatorios.toString('hex');
+  
+    // Se o comprimento da string gerada for maior que os dígitos necessários, corta o excesso
+    if (hexadecimalAleatorio.length > digitos) {
+      hexadecimalAleatorio = hexadecimalAleatorio.substring(0, digitos);
+    }
+  
+    return hexadecimalAleatorio;
+  }
+
 /* Rota padrão (Talvez será usada para hospedar o jogo) */
 app.get('/', async (req, res) => {
-    console.log(await users())
+    //console.log(await users())
     res.render("index.ejs")
+})
+
+app.post('/createRoom', async (req, res) => {
+    let host = req.body.nome;
+    let senha = req.body.senha;
+    const hex = gerarHexadecimalAleatorio(10);
+
+    try {
+        let q = conection.query(`INSERT INTO rooms(host, senha, hex) VALUES('${host}', '${senha}', '${hex}')`)
+        res.send(hex)
+    } catch(erro){
+        console.log(erro)
+        res.status(503)
+    }
 })
 
 /* Rota de cadastro do usuario */

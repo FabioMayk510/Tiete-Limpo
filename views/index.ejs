@@ -85,6 +85,15 @@
                 //}
             //)
         }
+
+        function newRoom(){
+            axios.post('/createRoom', {
+                nome: "Fabio",
+                senha: "teste"
+            }).then(res => {
+                console.log(res)
+            })
+        }
     </script>
     <h1>FABIN NA VOZ</h1>
 </body>
