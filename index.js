@@ -296,9 +296,15 @@ app.post('/createRoom', async (req, res) => {
 app.post('/searchRoom', async (req, res) => {
     let host = req.body.nome;
     let senha = req.body.senha;
-    console.log("Host: ", host, " Senha: ", senha)
+    let nome = req.body.username;
+    console.log("Host: ", host, " Senha: ", senha, " User: ", nome)
     let q = await conection.query(`SELECT host, senha, hex FROM rooms WHERE host = '${host}' AND senha = '${senha}'`)
-    q[0] === undefined ? res.status(401).send("Sala incorreta") : res.send(q[0])
+    if(q[0] === undefined){
+        res.status(401).send("Sala incorreta")
+    } else {
+        let quer = await conection.query(`UPDATE rooms SET p1 = '${nome}' WHERE host = '${host}'`)
+        res.send(q[0])
+    }
 })
 
 app.post('/over', async (req, res) => {
