@@ -94,6 +94,14 @@
                 console.log(res)
             })
         }
+
+        function searchRoom(){
+            axios.post('/searchRoom', {
+                hex: "Fabio"
+            }).then(res => {
+                console.log(res)
+            })
+        }
     </script>
     <h1>FABIN NA VOZ</h1>
 </body>

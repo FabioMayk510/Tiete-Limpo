@@ -281,15 +281,22 @@ app.get('/', async (req, res) => {
 app.post('/createRoom', async (req, res) => {
     let host = req.body.nome;
     let senha = req.body.senha;
+    let nome = req.body.username;
     const hex = gerarHexadecimalAleatorio(10);
 
     try {
-        let q = conection.query(`INSERT INTO rooms(host, senha, hex) VALUES('${host}', '${senha}', '${hex}')`)
+        let q = await conection.query(`INSERT INTO rooms(host, senha, hex, nome) VALUES('${host}', '${senha}', '${hex}', '${nome}')`)
         res.send(hex)
     } catch(erro){
         console.log(erro)
         res.status(503)
     }
+})
+
+app.post('/searchRoom', async (req, res) => {
+    let host = req.body.nome;
+    let q = await conection.query(`SELECT host, senha, hex FROM rooms WHERE host = '${host}'`)
+    res.send(q[0])
 })
 
 /* Rota de cadastro do usuario */
