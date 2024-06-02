@@ -307,15 +307,34 @@ app.post('/searchRoom', async (req, res) => {
     }
 })
 
-app.post('/loop', async (req, res) => {
-    let host = req.body.nome;
-    //let nome = req.body.username;
-    let q = await conection.query(`SELECT p1 FROM rooms WHERE host = '${host}'`)
+async function checkDatabaseCondition(host) {
+    const q = await conection.query(`SELECT p1 FROM rooms WHERE host = $1`, [host]);
+    console.log(q)
     if(q[0].p1 == null){
         console.log("ta nulo")
     } else {
         console.log("Alguem entrou")
+        return q
     }
+}
+
+app.post('/loop', async (req, res) => {
+    let host = req.body.nome;
+
+    const pollDatabase = async () => {
+        const conditionMet = await checkDatabaseCondition(host);
+        if (conditionMet) {
+            res.json("Player logado");
+        } else {
+            // Se a condição não foi atendida, continue verificando
+            setTimeout(pollDatabase, 1000); // Esperar 1 segundo antes de verificar novamente
+        }
+    };
+
+    pollDatabase();
+    //let nome = req.body.username;
+    // let q = await conection.query(`SELECT p1 FROM rooms WHERE host = '${host}'`)
+    
 })
 
 app.post('/over', async (req, res) => {
