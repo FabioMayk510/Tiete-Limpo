@@ -305,7 +305,7 @@ app.post('/searchRoom', async (req, res) => {
         res.status(401).send("Sala incorreta")
     } else {
         let quer = await conection.query(`UPDATE rooms SET p1 = '${nome}' WHERE host = '${host}'`)
-        res.send(q[0])
+        res.send(q)
     }
 })
 
