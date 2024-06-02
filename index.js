@@ -316,7 +316,6 @@ app.post('/loop', async (req, res) => {
         res.send("Nao ha players")
     } else {
         console.log("Alguem entrou")
-        res.send("Player logado")
     }
 })
 
