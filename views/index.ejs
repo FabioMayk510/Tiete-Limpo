@@ -125,9 +125,9 @@
             })
         }
 
-        function loop(){
+        function loop(param){
             axios.post('/loop', {
-                nome: "mojang"
+                nome: param
             }).then(res => {
                 console.log(res)
             })
