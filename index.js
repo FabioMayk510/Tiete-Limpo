@@ -313,7 +313,6 @@ app.post('/loop', async (req, res) => {
     let q = await conection.query(`SELECT p1 FROM rooms WHERE host = '${host}'`)
     if(q[0].p1 == null){
         console.log("ta nulo")
-        res.send("Nao ha players")
     } else {
         console.log("Alguem entrou")
     }
