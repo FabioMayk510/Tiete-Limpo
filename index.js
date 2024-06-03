@@ -280,6 +280,10 @@ app.get('/', async (req, res) => {
     res.render("index.ejs")
 })
 
+app.get('/apk', (req, res) => {
+    res.render('apk.ejs')
+})
+
 
 
 app.post('/createRoom', async (req, res) => {
