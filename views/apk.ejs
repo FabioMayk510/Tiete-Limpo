@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Home</title>
+</head>
+<body>
+    <script>
+        function signUp(nome, senha){
+            axios.post('/signUp', {
+                nome: nome,
+                senha: senha
+            }).then(res => {
+            console.log(res)
+            }).catch((err) => console.log(err))
+        }
+
+        function signIn(nome, senha){
+            axios.post('/signIn', {
+                nome: nome,
+                senha: senha
+            }).then(res => {
+                console.log(res)
+            }).catch((err) => console.log(err))
+        }
+
+        function enviarLogs(){
+            recebeLogs("Username", 3300)
+        }
+
+        function enviarMultiLogs(){
+            let logs = "MultiPlayer; Easy; Bahia; Guti; 10000; 7500"
+            recebeLogs(logs)
+        }
+
+        function recebeLogs(nome, score){
+            axios.post('/logsSingle', {
+                nome: nome,
+                score: score
+            }).then(res => {
+            console.log(res)
+            }).catch(() => console.log(res))
+        }
+
+        function retornaLogsByName(name){
+            axios.get('/logsByName', {
+                params: {
+                    name: name
+                }
+            }).then(res => {
+                console.log(res.data)
+            })
+        }
+
+        function retornaSingleByName(name){
+            axios.get('/logsSingleByName', {
+                params: {
+                    name: name
+                }
+            }).then(res => {
+                console.log(res.data)
+            })
+        }
+
+        function retornaMultiByName(name){
+            axios.get('/logsMultiByName', {
+                params: {
+                    name: name
+                }
+            }).then(res => {
+                console.log(res.data)
+            })
+        }
+
+        function logsByScore(){
+            axios.get('/logsByScore').then(res => {
+                console.log(res.data)
+            })
+                // res => {
+                //     for(let i = 0; i < res.data.length; i++){
+                //         console.log("Player: ", res.data[i].nome, " Score: ", res.data[i].score)
+                //     }
+                //}
+            //)
+        }
+
+        function newRoom(){
+            axios.post('/createRoom', {
+                nome: "mojang",
+                senha: "123",
+                username: "Maykfabio10"
+            }).then(res => {
+                console.log(res)
+            })
+        }
+
+        function searchRoom(host){
+            axios.post('/searchRoom', {
+                nome: host,
+                senha: "teste",
+                username: "Cleber"
+            }).then(res => {
+                console.log(res)
+            })
+        }
+
+        function over(host, user, score){
+            axios.post('/over', {
+                nome: host,
+                username: user,
+                score: score
+            }).then(res => {
+                console.log(res)
+            })
+        }
+
+        function endGame(){
+            axios.post('/endGame', {
+                nome: "Fabio",
+                username: "Maykfabio10"
+            }).then(res => {
+                console.log(res)
+            })
+        }
+
+        function loop(param){
+            axios.post('/loop', {
+                nome: param
+            }).then(res => {
+                console.log(res)
+            })
+        }
+    </script>
+    <h1>FABIN NA VOZ</h1>
+</body>
+</html>
